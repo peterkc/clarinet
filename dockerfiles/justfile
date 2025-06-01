@@ -1,0 +1,41 @@
+#!/usr/bin/env just --timestamp --highlight --working-directory . --justfile
+
+# ---------------------------------------------------------
+set shell := ["bash", "-cu"]
+set windows-shell := ["pwsh.exe", "-NoLogo", "-Command"]
+
+# ---------------------------------------------------------
+set export
+set positional-arguments
+set dotenv-load
+set ignore-comments
+#set fallback
+
+set allow-duplicate-recipes
+set allow-duplicate-variables
+
+# -----------------------------------------------------------------------------
+SELF    := justfile()
+WORKDIR := invocation_directory()
+
+# -----------------------------------------------------------------------------
+DOCKER_BUILDKIT := "1"
+DOCKER_BUILDER  := env_var_or_default('DOCKER_BUILDER', 'cloud-peterkc-buildx')
+BUILDX_BAKE_ENTITLEMENTS_FS := "1"
+
+# -----------------------------------------------------------------------------
+info:
+    @echo "${VERSION}-${GIT_HASH}${GIT_DIFF}"
+
+git-status:
+    [[ $(git diff --shortstat 2> /dev/null | tail -n1) != "" ]] && echo "*"
+
+# -----------------------------------------------------------------------------
+# buildx
+
+alias bake := buildx-bake
+
+[group('buildx')]
+[doc('')]
+buildx-bake target +args="":
+    docker buildx --builder ${DOCKER_BUILDER} bake --file "containers.hcl" {{target}} {{args}}
