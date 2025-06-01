@@ -17,7 +17,7 @@ FROM debian:bookworm-slim
 
 COPY --from=builder /stacks/target/release/stacks-node /bin
 
-RUN apt update
+RUN apt update && apt install -y tini
 RUN apt-get clean && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
 WORKDIR /root

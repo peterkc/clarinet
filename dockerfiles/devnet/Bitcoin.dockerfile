@@ -66,6 +66,7 @@ RUN apk --no-cache add --update \
     libgcc \
     sqlite \
     sqlite-libs \
+    tini \
     && mkdir /bitcoin
 
 COPY --from=build /out/ /usr/local/bin/
